@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
-#include <conio.h>
+#include <string.h>
+#include <windows.h>
 #include <locale.h>
 
 #define TREE_HEIGHT 10 // Высота елки
@@ -72,17 +72,49 @@ void draw_tree()
     }
 }
 
+// Функция, которая очищает экран терминала
+void clear_screen()
+{
+    // Вызываем команду cls, которая очищает экран
+    puts("\033[2J\033[H");
+}
+
+// Функция, которая проверяет, нажал ли пользователь какую-то клавишу
+int key_pressed()
+{
+    // Определяем коды клавиш
+    int key = 0x4B;  // K
+    int key2 = 0x11; // Ctrl
+    int key3 = 0x12; // Alt
+    // Проверяем, нажаты ли все три клавиши
+    if (GetAsyncKeyState(key) & 0x8000 && GetAsyncKeyState(key2) & 0x8000 && GetAsyncKeyState(key3) & 0x8000)
+    {
+        // Возвращаем 1, если да
+        return 1;
+    }
+    else
+    {
+        // Возвращаем 0, если нет
+        return 0;
+    }
+}
+
 // Функция, которая печатает поздравление
 void print_greeting()
 {
     // Текст поздравления
-    char *text = "С Новым Годом \u2744";
+    char *text = "\u2744 С Новым Годом \u2744";
     // Расстояние от края до текста
-    int margin = (TREE_WIDTH - strlen(text)) / 2;
+    int margin = ((TREE_WIDTH + 7) - strlen(text)) / 2;
     // Печатаем пустую строку
     printf("\n");
     // Печатаем текст с отступом
     printf("%*s%s\n", margin, SPACE, text);
+    // Печатаем пустую строку
+    printf("\n");
+    // Печатаем команду для выхода
+    printf("%*s%s\n", margin, SPACE, "Для выхода зажми Ctrl+Alt+K");
+    printf("%*s%s\n", margin, SPACE, "Или нажми Ctrl+C");
 }
 
 // Функция, которая очищает консоль
@@ -95,9 +127,13 @@ void clear()
 int main()
 {
     setlocale(LC_ALL, "ru_RU.UTF-8");
-    clear();
-    draw_tree();
-    print_greeting();
-    getch();
+    clear_screen();
+    while (!key_pressed())
+    {
+        clear_screen();
+        draw_tree();
+        print_greeting();
+        Sleep(1000);
+    }
     exit(0);
 }
